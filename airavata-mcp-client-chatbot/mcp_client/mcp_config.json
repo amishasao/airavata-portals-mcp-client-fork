@@ -1,0 +1,14 @@
+{
+  "mcp": {
+    "servers": {
+      "filesystem": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "C:/Apache Airavata/airavata-portals-mcp-client-fork/airavata-mcp-client-chatbot"
+        ]
+      }
+    }
+  }
+}

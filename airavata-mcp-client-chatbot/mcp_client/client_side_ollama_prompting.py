@@ -5,11 +5,11 @@ from langchain_ollama import OllamaLLM
 from mcp_use import MCPAgent, MCPClient
 
 
-class ToolCallingOllamaLLM(OllamaLLM):
-    def bind_tools(self, tools):
-        # Override to handle tool binding if necessary
-        self.tools = tools
-        return self
+# class ToolCallingOllamaLLM(OllamaLLM):
+#     def bind_tools(self, tools):
+#         # Override to handle tool binding if necessary
+#         self.tools = tools
+#         return self
 
 
 async def main():
