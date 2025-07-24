@@ -1,0 +1,45 @@
+.resultsContainer {
+  padding: 30px;
+  padding-bottom: 140px; /* Room for fixed input */
+  width: 100vw;
+  box-sizing: border-box;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px); /* Adjust if needed */
+}
+  .messageRow {
+    display: flex;
+    margin: 16px 0;
+  }
+  
+  .messageRow.user {
+    justify-content: flex-end;  /* push user messages to the right */
+  }
+  
+  .messageRow.bot {
+    justify-content: flex-start; /* push bot messages to the left */
+  }
+  
+  .messageBubble {
+    border-radius: 27px;
+    padding: 16px 24px;
+    max-width: 60%;
+    font-size: 18px;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+  
+  .messageBubble.user {
+    background-color: #F4C2BE;
+    color: black;
+  }
+  
+  .messageBubble.bot {
+    /* Remove bubble styles for bot messages */
+    display: inline;        /* just inline text */
+    background: none;       /* no background */
+    color: black;
+    border-radius: 0;       /* no rounding */
+    padding: 0;             /* no padding */
+    max-width: none;        /* no max width */
+    word-wrap: normal;      /* normal wrapping */
+  }

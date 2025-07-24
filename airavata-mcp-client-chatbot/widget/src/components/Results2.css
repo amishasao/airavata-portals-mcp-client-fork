@@ -1,0 +1,67 @@
+.resultsContainer {
+  padding: 30px;
+  padding-bottom: 140px; /* Room for fixed input */
+  width: 100vw;
+  box-sizing: border-box;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  background: #f5f5f5; /* Light background like your App.tsx */
+}
+
+.chatMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.messageRow {
+  display: flex;
+  margin: 16px 0;
+}
+
+.messageRow.user {
+  justify-content: flex-end;  /* push user messages to the right */
+}
+
+.messageRow.bot {
+  justify-content: flex-start; /* push bot messages to the left */
+}
+
+.messageBubble {
+  border-radius: 27px;
+  padding: 16px 24px;
+  max-width: 60%;
+  font-size: 18px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.messageBubble.user {
+  background-color: #F4C2BE; /* Your original user bubble color */
+  color: black;
+}
+
+.messageBubble.bot {
+  background-color: #ffffff; /* White background for bot messages */
+  color: black;
+  border: 1px solid #e0e0e0; /* Light border */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Scrollbar styling (subtle) */
+.chatMessages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatMessages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatMessages::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.chatMessages::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
