@@ -25,8 +25,7 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
 
-  // const [messages, setMessages] = useState<Message[]>([]);
-  // const [input, setInput] = useState("");
+// (Removed commented-out code for better readability and maintainability)
 
   useEffect(() => {
     if (state?.question && messages.length === 0) {
