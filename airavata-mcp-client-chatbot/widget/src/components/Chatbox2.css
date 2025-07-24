@@ -1,0 +1,109 @@
+.inputContainer {
+  border-radius: 25px;
+  background: #fff;
+  box-shadow: 0px 3px 13.3px rgba(0, 0, 0, 0.25);
+  width: 890px;
+  padding: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inputContainerFixed {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 720px;
+  background-color: white;
+  padding: 16px;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.inputContainerFixed .inputRow {
+  width: 100%;
+  max-width: 890px;
+  display: flex;
+  align-items: center;
+}
+
+.inputRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.inputField {
+  flex: 1;
+  height: 40px;
+  border: none;
+  font-size: 16px;
+  outline: none;
+  padding: 0 12px;
+}
+
+.inputField:focus {
+  outline: none;
+}
+
+/* Send button - made visible again */
+.iconButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.iconButton:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.footerRow {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  align-self: flex-start;
+}
+
+.pill {
+  height: 21px;
+  border-radius: 7px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 10px;
+  flex-shrink: 0;
+}
+
+.pill:hover {
+  background: #f8f9fa;
+}

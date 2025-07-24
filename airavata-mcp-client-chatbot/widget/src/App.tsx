@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Chatbox from "./components/Chatbox";
 import Results from "./components/Results";
 
+export interface Message {
+  id: string;
+  from: "user" | "bot";
+  text: string;
+  timestamp: Date;
+}
+
 const App: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const addMessage = (text: string, from: "user" | "bot") => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      from,
+      text,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, newMessage]);
+  };
+
+  const handleUserMessage = (text: string) => {
+    addMessage(text, "user");
+
+    // simulate bot response after a short delay
+    setTimeout(() => {
+      addMessage(`Thanks for your message: "${text}"`, "bot");
+    }, 1000);
+  };
+
   return (
     <Router>
       <div
@@ -24,7 +52,11 @@ const App: React.FC = () => {
             element={
               <>
                 <h1>What can I do for your research?</h1>
-                <Chatbox fixedBottom={false} />
+                <Chatbox
+                  fixedBottom={false}
+                  onSend={handleUserMessage}
+                  messages={messages} // TODO: fix this
+                />
               </>
             }
           />
@@ -32,8 +64,10 @@ const App: React.FC = () => {
             path="/results"
             element={
               <>
-                <Results />
-                <Chatbox fixedBottom={true} />
+                <Results
+                  messages={messages}
+                  onSendMessage={handleUserMessage}
+                />
               </>
             }
           />

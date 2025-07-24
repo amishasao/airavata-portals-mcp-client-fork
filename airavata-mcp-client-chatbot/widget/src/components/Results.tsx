@@ -1,73 +1,99 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import "./Results.css";
-import Chatbox from './Chatbox';
+import "./Results2.css";
+import Chatbox from "./Chatbox";
 
-
-interface Message {
+export interface Message {
+  id: string;
   from: "user" | "bot";
   text: string;
+  timestamp: Date;
+}
+
+interface ResultsProps {
+  messages?: Message[];
+  onSendMessage?: (message: string) => void;
 }
 
 interface LocationState {
   question: string;
 }
 
-const Results: React.FC = () => {
+const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
   const location = useLocation();
   const state = location.state as LocationState | undefined;
-
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    if (state?.question) {
-      setMessages([
-        { from: "user", text: state.question },
-        { from: "bot", text: "Hi {username} :)" },
-      ]);
-    }
-  }, []);
+  const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
 
+  // const [messages, setMessages] = useState<Message[]>([]);
+  // const [input, setInput] = useState("");
+
+  useEffect(() => {
+    if (state?.question && messages.length === 0) {
+      const initialMessage: Message = {
+        id: Date.now().toString(),
+        from: "user",
+        text: state.question,
+        timestamp: new Date(),
+      };
+      // setMessages([
+      //   { from: "user", text: state.question },
+      //   { from: "bot", text: "Hi {username} :)" },
+      // ]);
+      setDisplayedMessages([initialMessage]);
+
+      // add bot response after delay
+      setTimeout(() => {
+        const botResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          from: "bot",
+          text: "Hi there! Thanks for y9our question. How can I help you with your research?",
+          timestamp: new Date(),
+        };
+        setDisplayedMessages((prev) => [...prev, botResponse]);
+      }, 1000);
+    } else {
+      setDisplayedMessages(messages);
+    }
+  }, [state?.question, messages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [displayedMessages]);
 
-
-  const handleSend = (msg: string) => {
-    setMessages((prev) => [...prev, { text: msg, from: 'user' }]);
-    // Optionally: Add fake bot reply
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { text: 'Thanks for your message!', from: 'bot' }]);
-    }, 1000);
+  const formatTime = (timestamp: Date) => {
+    return timestamp.toLocaleDateString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
-  
-
-  
 
   return (
     <div className="resultsContainer">
       <div className="chatMessages">
-        {messages.map((msg, idx) => (
-          <div key={idx} className={`messageRow ${msg.from}`}>
-            <span className={`messageBubble ${msg.from}`}>{msg.text}</span>
+        {displayedMessages.map((msg, idx) => (
+          <div
+            key={msg.id}
+            className={`messageRow ${msg.from}`}
+            // adding an animation to make it smoother
+            style={{
+              animation: `slideIn 0.3s ease-out ${idx * 0.1}s both`,
+            }}
+          >
+            <div className={`messageBubble ${msg.from}`}>
+              <span className="messageText">{msg.text}</span>
+              <span className="messageTime">{formatTime(msg.timestamp)}</span>
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
-  
+
       <Chatbox
         fixedBottom
-        onSend={(msg: string) => {
-          setMessages((prev) => [
-            ...prev,
-            { from: 'user', text: msg },
-            { from: 'bot', text: `You said: "${msg}"` }
-          ]);
-        }}
+        onSend={onSendMessage} // src code in Chatbox.tsx
+        messages={displayedMessages}
       />
     </div>
   );
