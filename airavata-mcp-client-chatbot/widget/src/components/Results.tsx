@@ -46,7 +46,7 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
         const botResponse: Message = {
           id: (Date.now() + 1).toString(),
           from: "bot",
-          text: "Hi there! Thanks for y9our question. How can I help you with your research?",
+          text: "Hi there! Thanks for your question. How can I help you with your research?",
           timestamp: new Date(),
         };
         setDisplayedMessages((prev) => [...prev, botResponse]);
