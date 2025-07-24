@@ -55,7 +55,7 @@ const App: React.FC = () => {
                 <Chatbox
                   fixedBottom={false}
                   onSend={handleUserMessage}
-                  messages={messages} // TODO: fix this
+                  messages={messages}
                 />
               </>
             }

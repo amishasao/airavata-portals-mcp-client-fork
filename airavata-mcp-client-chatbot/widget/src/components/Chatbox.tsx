@@ -25,7 +25,7 @@ const Chatbox: React.FC<ChatboxProps> = ({
   showMessages = false,
 }) => {
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false); // provides visual feedback when sending a message
+  const [isTyping, setIsTyping] = useState(false); // provides feedback when sending a message
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
