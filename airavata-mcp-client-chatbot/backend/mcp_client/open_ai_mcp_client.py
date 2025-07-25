@@ -31,7 +31,7 @@ async def init_mcp():
         }
     }
 
-    sandbox_options = {
+    sandbox_options: SandboxOptions = {
         "api_key": os.getenv("E2B_API_KEY"),
         "sandbox_template_id": "base"
     }
