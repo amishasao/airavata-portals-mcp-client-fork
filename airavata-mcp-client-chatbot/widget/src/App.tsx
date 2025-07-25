@@ -28,7 +28,11 @@ const App: React.FC = () => {
 
     // add API call to the backend
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
+      const API_URL = process.env.REACT_APP_API_URL || "";
+      if (!API_URL) {
+        console.error("REACT_APP_API_URL is not set. Please configure it in your environment.");
+        throw new Error("Missing API URL configuration.");
+      }
 
       const response = await fetch(`${API_URL}/api/chat`, {
         method: "POST",
