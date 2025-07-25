@@ -23,13 +23,46 @@ const App: React.FC = () => {
     setMessages((prev) => [...prev, newMessage]);
   };
 
-  const handleUserMessage = (text: string) => {
+  const handleUserMessage = async (text: string) => {
     addMessage(text, "user");
 
+    // add API call to the backend
+    try {
+      const API_URL = process.env.REACT_APP_API_URL || "";
+      if (!API_URL) {
+        console.error("REACT_APP_API_URL is not set. Please configure it in your environment.");
+        throw new Error("Missing API URL configuration.");
+      }
+
+      const response = await fetch(`${API_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      if (!response.ok) {
+        console.error(`Error: ${response.status} ${response.statusText}`);
+        addMessage("Sorry, something went wrong.", "bot");
+        return;
+      }
+      const data = await response.json();
+
+      if (data.success && data.response) {
+        addMessage(data.response, "bot");
+      } else {
+        addMessage("Sorry, something went wrong.", "bot");
+      }
+    } catch (error) {
+      console.error("Error calling backend:", error);
+      addMessage("Server error. Please try again later.", "bot");
+    }
+
     // simulate bot response after a short delay
-    setTimeout(() => {
-      addMessage(`Thanks for your message: "${text}"`, "bot");
-    }, 1000);
+    // setTimeout(() => {
+    //   addMessage(`Thanks for your message: "${text}"`, "bot");
+    // }, 1000);
   };
 
   return (
