@@ -5,12 +5,23 @@ from mcp_use import MCPClient, MCPAgent
 from mcp_use.types.sandbox import SandboxOptions
 from dotenv import load_dotenv
 
+load_dotenv()
 
-async def main():
+# Create the agent and client globally once (can also be in an init function if needed)
+llm = ChatOpenAI(
+    model="gpt-4o",
+    temperature=0.1,
+    max_tokens=1000
+)
 
-    load_dotenv()
+# Global variables for reuse (optional to keep persistent client in production)
+client = None
+agent = None
 
-    # MCP server config (replace or extend as needed)
+
+async def init_mcp():
+    global client, agent
+
     server_config = {
         "mcpServers": {
             "everything": {
@@ -20,7 +31,7 @@ async def main():
         }
     }
 
-    sandbox_options = SandboxOptions = {
+    sandbox_options: SandboxOptions = {
         "api_key": os.getenv("E2B_API_KEY"),
         "sandbox_template_id": "base"
     }
@@ -31,17 +42,19 @@ async def main():
         sandbox_options=sandbox_options
     )
 
-    llm = ChatOpenAI(
-        model="gpt-4o",
-        temperature=0.1,
-        max_tokens=1000
-    )
     agent = MCPAgent(llm=llm, client=client)
 
-    result = await agent.run("Could you please tell me what tools you have access to?")
-    print(f"\nResult: {result}")
 
-    await client.close_all_sessions()
+async def run_agent_query(message: str) -> str:
+    global agent
+    if agent is None:
+        await init_mcp()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+    result = await agent.run(message)
+    return result
+
+
+async def close_mcp():
+    global client
+    if client:
+        await client.close_all_sessions()
