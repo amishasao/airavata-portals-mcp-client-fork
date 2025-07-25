@@ -38,6 +38,11 @@ const App: React.FC = () => {
         body: JSON.stringify({ message: text }),
       });
 
+      if (!response.ok) {
+        console.error(`Error: ${response.status} ${response.statusText}`);
+        addMessage("Sorry, something went wrong.", "bot");
+        return;
+      }
       const data = await response.json();
 
       if (data.success && data.response) {
