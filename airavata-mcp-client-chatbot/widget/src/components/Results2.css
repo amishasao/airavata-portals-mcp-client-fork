@@ -65,3 +65,19 @@
 .chatMessages::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.3);
 }
+
+.messageTimestamp {
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+
+.messageTimestamp.user {
+  text-align: right;
+}
+
+.messageTimestamp.bot {
+  text-align: left;
+}
