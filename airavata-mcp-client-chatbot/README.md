@@ -28,6 +28,7 @@ cd airavata-portals-mcp-client-fork/airavata-mcp-client-chatbot/backend
 python app.py
 ```
 This will start the backend at localhost:5000.
+
 2. (opt.) Test server health:
 ```
 curl http://localhost:5000/health
