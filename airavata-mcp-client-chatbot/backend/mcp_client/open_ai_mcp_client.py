@@ -94,8 +94,11 @@ def call_mcp_function(function_name: str, parameters: Dict[str, Any]) -> Dict[st
         else:
             return {"error": f"Unsupported method: {method}"}
 
-        if response.status_code == 200:
-            return response.json()
+        if 200 <= response.status_code < 300:
+            try:
+                return response.json() if response.content else {"message": "Success"}
+            except ValueError:
+                return {"message": "Success"}
         else:
             return {"error": f"API call failed with status {response.status_code}: {response.text}"}
 
