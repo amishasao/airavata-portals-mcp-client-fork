@@ -29,6 +29,7 @@ const App: React.FC = () => {
     // add API call to the backend
     try {
       const API_URL = process.env.REACT_APP_API_URL || "";
+
       if (!API_URL || API_URL.trim() === '') {
         console.error("REACT_APP_API_URL is not set or is invalid. Please configure it in your environment.");
         throw new Error("Missing or invalid API URL configuration.");

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Chatbox2.css";
+
 import { useNavigate } from "react-router-dom";
 
 // added this so that App.tsx and Results.tsx can import and use the same Message type
