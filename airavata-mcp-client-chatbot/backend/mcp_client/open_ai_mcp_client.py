@@ -22,7 +22,9 @@ llm = ChatOpenAI(
 client = None
 agent = None
 
-MCP_SERVER_URL = "https://api.dev.cybershuttle.org:18889"
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", None)
+if not MCP_SERVER_URL:
+    raise ValueError("MCP_SERVER_URL environment variable is not set.")
 
 
 # ---------------- MCP Server Function Integration ---------------- #
