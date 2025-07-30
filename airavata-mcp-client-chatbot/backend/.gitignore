@@ -1,2 +1,2 @@
 *.env
-mcp_client/__pycache__/
+mcp_client/__pycache__/*
