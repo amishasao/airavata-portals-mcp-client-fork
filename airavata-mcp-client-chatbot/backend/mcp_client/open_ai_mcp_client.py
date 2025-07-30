@@ -222,7 +222,8 @@ async def run_agent_query(message: str) -> str:
     if agent is None:
         await init_mcp()
 
-    # ✅ DO NOT await this — it’s not async
+    # The agent.run() method is synchronous in the current configuration (AgentType.OPENAI_FUNCTIONS).
+    # If the agent type or configuration changes, verify whether this method needs to be awaited.
     result = agent.run(message)
     return result
 
