@@ -13,8 +13,12 @@ pip install -r requirements.txt
 ```
 3. Set up environment variables:
 ```
+# get an OpenAI API key from their website
 export OPENAI_API_KEY="openai-api-key"
+# create a Sandbox account and create a new E2B API key
 export E2B_API_KEY="sandbox-api-key"
+# run the server and copy/paste the api.dev link here
+export MCP_SERVER_URL="link-here"
 ```
 4. Install frontend dependencies
 ```
