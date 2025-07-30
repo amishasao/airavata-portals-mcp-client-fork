@@ -35,7 +35,7 @@ This will start the backend at localhost:5000.
 
 2. (opt.) Test server health:
 ```
-curl http://localhost:5000/health
+curl http://localhost:5000/api/health
 ```
 3. In a new terminal, start the frontend:
 ```
