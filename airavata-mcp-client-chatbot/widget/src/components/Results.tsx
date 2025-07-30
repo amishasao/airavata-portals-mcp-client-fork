@@ -25,8 +25,6 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
 
-// (Removed commented-out code for better readability and maintainability)
-
   useEffect(() => {
     if (state?.question && messages.length === 0) {
       const initialMessage: Message = {
