@@ -29,9 +29,10 @@ const App: React.FC = () => {
     // add API call to the backend
     try {
       const API_URL = process.env.REACT_APP_API_URL || "";
-      if (!API_URL) {
-        console.error("REACT_APP_API_URL is not set. Please configure it in your environment.");
-        throw new Error("Missing API URL configuration.");
+
+      if (!API_URL || API_URL.trim() === '') {
+        console.error("REACT_APP_API_URL is not set or is invalid. Please configure it in your environment.");
+        throw new Error("Missing or invalid API URL configuration.");
       }
 
       const response = await fetch(`${API_URL}/api/chat`, {
@@ -88,7 +89,7 @@ const App: React.FC = () => {
                 <Chatbox
                   fixedBottom={false}
                   onSend={handleUserMessage}
-                  messages={messages} // TODO: fix this
+                  messages={messages}
                 />
               </>
             }

@@ -25,8 +25,6 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [displayedMessages, setDisplayedMessages] = useState<Message[]>([]);
 
-// (Removed commented-out code for better readability and maintainability)
-
   useEffect(() => {
     if (state?.question && messages.length === 0) {
       const initialMessage: Message = {
@@ -80,9 +78,15 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
               animation: `slideIn 0.3s ease-out ${idx * 0.1}s both`,
             }}
           >
-            <div className={`messageBubble ${msg.from}`}>
-              <span className="messageText">{msg.text}</span>
-              <span className="messageTime">{formatTime(msg.timestamp)}</span>
+            <div className={`messageRow ${msg.from}`}>
+            <div className="messageGroup">
+                <div className={`messageBubble ${msg.from}`}>
+                  <span className="messageText">{msg.text}</span>
+                </div>
+                <div className={`messageTimestamp ${msg.from}`}>
+                  {formatTime(msg.timestamp)}
+                </div>
+              </div>
             </div>
           </div>
         ))}

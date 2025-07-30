@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Chatbox2.css";
-// (Removed the commented-out import as it is not needed)
+
 import { useNavigate } from "react-router-dom";
 
 // added this so that App.tsx and Results.tsx can import and use the same Message type
@@ -25,7 +25,7 @@ const Chatbox: React.FC<ChatboxProps> = ({
   showMessages = false,
 }) => {
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false); // provides visual feedback when sending a message
+  const [isTyping, setIsTyping] = useState(false); // provides feedback when sending a message
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -37,33 +37,22 @@ const Chatbox: React.FC<ChatboxProps> = ({
 
   // added typing state and better validation
   const handleSend = () => {
-    console.log("🚀 handleSend called"); // Debug log
-    console.log("📝 Input value:", input); // Debug log
-    console.log("✂️ Trimmed input:", input.trim()); // Debug log
-
     if (input.trim() === "") {
-      console.log("❌ Input is empty, returning early"); // Debug log
       return;
     }
-
-    console.log("⏳ Setting isTyping to true"); // Debug log
     setIsTyping(true);
-
     if (onSend) {
-      console.log("📤 Calling onSend with:", input.trim()); // Debug log
       onSend(input.trim());
       setTimeout(() => {
         navigate("/results");
       }, 100);
     } else {
-      console.log("🧭 Navigating to /results with question:", input.trim()); // Debug log
       navigate("/results", { state: { question: input.trim() } });
     }
 
     console.log("🧹 Clearing input"); // Debug log
     setInput("");
     setTimeout(() => {
-      console.log("✅ Setting isTyping to false"); // Debug log
       setIsTyping(false);
     }, 500);
   };
@@ -96,11 +85,9 @@ const Chatbox: React.FC<ChatboxProps> = ({
             placeholder="Ask away :)"
             value={input}
             onChange={(e) => {
-              console.log("Typing:", e.target.value);
               setInput(e.target.value);
             }}
             onKeyDown={(e) => {
-              console.log("🔑 Key pressed:", e.key); // Debug log
               if (e.key === "Enter" && !e.shiftKey) {
                 console.log(
                   "↩️ Enter key detected, preventing default and calling handleSend"
