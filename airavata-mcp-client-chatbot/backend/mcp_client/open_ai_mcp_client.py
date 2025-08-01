@@ -16,7 +16,11 @@ load_dotenv()
 llm = ChatOpenAI(
     model="gpt-4o",
     temperature=0.1,
-    max_tokens=1000
+    max_tokens=1000,
+    messages=[{
+        "role": "system",
+        "content": "Always format your response using Markdown, including for code, tables, and lists."
+    }]
 )
 
 client = None

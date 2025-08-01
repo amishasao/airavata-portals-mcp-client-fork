@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import "./Results2.css";
 import Chatbox from "./Chatbox";
+import ReactMarkdown from "react-markdown";
 
 export interface Message {
   id: string;
@@ -79,9 +80,16 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
             }}
           >
             <div className={`messageRow ${msg.from}`}>
-            <div className="messageGroup">
+              <div className="messageGroup">
                 <div className={`messageBubble ${msg.from}`}>
-                  <span className="messageText">{msg.text}</span>
+                  {/* <span className="messageText">{msg.text}</span> */}
+                  <span className="messageText">
+                    {msg.from === "bot" ? (
+                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    ) : (
+                      msg.text
+                    )}
+                  </span>
                 </div>
                 <div className={`messageTimestamp ${msg.from}`}>
                   {formatTime(msg.timestamp)}

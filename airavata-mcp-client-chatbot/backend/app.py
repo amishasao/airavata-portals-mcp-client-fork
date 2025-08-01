@@ -3,7 +3,7 @@ from flask_cors import CORS
 import sys
 import asyncio
 import os
-from mcp_client.open_ai_mcp_client import run_agent_query, close_mcp
+from mcp_client.open_ai_mcp_client import run_agent_query
 
 app = Flask(__name__)
 CORS(app)
