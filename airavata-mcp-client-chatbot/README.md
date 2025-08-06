@@ -98,4 +98,10 @@ airavata-mcp-client-chatbot
 │  ├─ README.md                           
 │  └─ tsconfig.json                       
 └─ README.md
-```                    
+```
+
+## Contributing
+1. Fork the repository
+2. Create a feature branch
+3. Make changes and add tests in a separate folder
+4. Submit a detailed pull request with explanations on what improvements have been made
