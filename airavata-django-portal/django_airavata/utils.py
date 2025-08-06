@@ -1,5 +1,7 @@
 import logging
 import ssl
+import queue
+from django.conf import settings
 from contextlib import contextmanager
 
 import thrift_connector.connection_pool as connection_pool
@@ -46,12 +48,13 @@ def get_unsecure_transport(hostname, port):
 def get_secure_transport(hostname, port):
 
     # Create a socket to the Airavata Server
-    # TODO: validate server certificate
-    transport = TSSLSocket.TSSLSocket(hostname, port, validate=False)
-
-    # Use Buffered Protocol to speedup over raw sockets
-    transport = TTransport.TBufferedTransport(transport)
-    return transport
+    transport = TSSLSocket.TSSLSocket(
+        hostname,
+        port,
+        cert_reqs=ssl.CERT_REQUIRED,
+        ca_certs=settings.CA_CERTS_PATH,
+    )
+    return TTransport.TBufferedTransport(transport)
 
 
 def get_transport(hostname, port, secure=True):
@@ -171,6 +174,56 @@ def get_thrift_client(host, port, is_secure, client_generator):
         raise ThriftConnectionException(msg) from e
 
 
+@contextmanager
+def simple_thrift_connection(pool):
+    """Context manager for borrowing a connection from the pool."""
+    conn = pool.get_connection()
+    try:
+        yield conn['client']
+    finally:
+        pool.return_connection(conn)
+
+
+class SimpleThriftPool:
+    """
+    A thread-safe Thrift connection pool that uses raw Thrift and the TBufferedTransport.
+    """
+
+    def __init__(self, service, host, port, size=5):
+        self._service = service
+        self._host = host
+        self._port = port
+        self._size = size
+        self._pool = queue.Queue(maxsize=size)
+        self._initialize_pool()
+
+    def _initialize_pool(self):
+        for _ in range(self._size):
+            self._pool.put(self._create_connection())
+
+    def _create_connection(self):
+        transport = TSocket.TSocket(host=self._host, port=self._port)
+        transport = TTransport.TBufferedTransport(transport)
+        protocol = TBinaryProtocol.TBinaryProtocol(transport)
+        client = self._service.Client(protocol)
+        transport.open()
+        return {'client': client, 'transport': transport}
+
+    def get_connection(self):
+        return self._pool.get()
+
+    def return_connection(self, conn):
+        try:
+            if conn['transport'].isOpen():
+                conn['transport'].close()
+        except Exception:
+            pass
+        self._pool.put(self._create_connection())
+
+    def connection(self):
+        return simple_thrift_connection(self)
+
+
 class CustomThriftClient(connection_pool.ThriftClient):
     secure = False
     validate = False
@@ -181,10 +234,13 @@ class CustomThriftClient(connection_pool.ThriftClient):
             return super().get_socket_factory()
         else:
             def factory(host, port):
-                return TSSLSocket.TSSLSocket(host, port,
-                                             cert_reqs=(ssl.CERT_REQUIRED
-                                                        if cls.validate
-                                                        else ssl.CERT_NONE))
+                return TSSLSocket.TSSLSocket(
+                    host,
+                    port,
+                    cert_reqs=ssl.CERT_REQUIRED,
+                    ca_certs=settings.CA_CERTS_PATH,
+                )
+
             return factory
 
     def ping(self):
@@ -235,12 +291,10 @@ class UserProfileServiceThriftClient(MultiplexThriftClientMixin,
     secure = settings.PROFILE_SERVICE_SECURE
 
 
-airavata_api_client_pool = connection_pool.ClientPool(
+airavata_api_client_pool = SimpleThriftPool(
     Airavata,
     settings.AIRAVATA_API_HOST,
-    settings.AIRAVATA_API_PORT,
-    connection_class=AiravataAPIThriftClient,
-    keepalive=settings.THRIFT_CLIENT_POOL_KEEPALIVE
+    settings.AIRAVATA_API_PORT
 )
 group_manager_client_pool = connection_pool.ClientPool(
     GroupManagerService,

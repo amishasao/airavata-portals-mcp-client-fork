@@ -4,6 +4,7 @@ import json
 import logging
 from pathlib import Path
 from urllib.parse import quote
+from airavata.model.application.io.ttypes import DataType
 
 from airavata.model.appcatalog.appdeployment.ttypes import (
     ApplicationDeploymentDescription,
@@ -312,59 +313,93 @@ class ApplicationModuleSerializer(
         return request.is_gateway_admin
 
 
-class InputDataObjectTypeSerializer(
-        thrift_utils.create_serializer_class(InputDataObjectType)):
-    metaData = StoredJSONField(required=False, allow_null=True)
+class EnumChoiceField(serializers.ChoiceField):
+    def __init__(self, enum_class, **kwargs):
+        self.enum_class = enum_class
+        kwargs['choices'] = [(member.name, member.name) for member in enum_class]
+        super().__init__(**kwargs)
 
-    class Meta:
-        required = ('name',)
+    def to_internal_value(self, data):
+        if isinstance(data, int):
+            try:
+                return self.enum_class(data)
+            except ValueError:
+                self.fail('invalid_choice', input=data)
+        try:
+            return self.enum_class[data]
+        except KeyError:
+            self.fail('invalid_choice', input=data)
+
+    def to_representation(self, value):
+        return value.name
 
 
-class OutputDataObjectTypeSerializer(
-        thrift_utils.create_serializer_class(OutputDataObjectType)):
-    metaData = StoredJSONField(required=False, allow_null=True)
+class InputDataObjectTypeSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    value = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    type = EnumChoiceField(enum_class=DataType)
+    applicationArgument = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    standardInput = serializers.BooleanField(default=False)
+    userFriendlyDescription = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    metaData = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    inputOrder = serializers.IntegerField(required=False, allow_null=True)
+    isRequired = serializers.BooleanField(default=False)
+    requiredToAddedToCommandLine = serializers.BooleanField(default=False)
+    dataStaged = serializers.BooleanField(default=False)
+    storageResourceId = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    isReadOnly = serializers.BooleanField(default=False)
+    overrideFilename = serializers.CharField(allow_blank=True, allow_null=True, required=False)
 
-    class Meta:
-        required = ('name',)
+    def create(self, validated_data):
+        return InputDataObjectType(**validated_data)
 
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
 
-class ApplicationInterfaceDescriptionSerializer(
-        thrift_utils.create_serializer_class(ApplicationInterfaceDescription)):
+class OutputDataObjectTypeSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    value = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    type = EnumChoiceField(enum_class=DataType)
+    applicationArgument = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    isRequired = serializers.BooleanField(default=False)
+    requiredToAddedToCommandLine = serializers.BooleanField(default=False)
+    dataMovement = serializers.BooleanField(default=False)
+    location = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    searchQuery = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    outputStreaming = serializers.BooleanField(default=False)
+    storageResourceId = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    metaData = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+
+    def create(self, validated_data):
+        return OutputDataObjectType(**validated_data)
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        return instance
+
+class ApplicationInterfaceDescriptionSerializer(serializers.Serializer):
+    applicationInterfaceId = serializers.CharField(required=False)
+    applicationName = serializers.CharField()
+    applicationDescription = serializers.CharField(allow_blank=True, allow_null=True, required=False)
+    applicationModules = serializers.ListField(child=serializers.CharField(), allow_null=True, required=False)
+    applicationInputs = InputDataObjectTypeSerializer(many=True, allow_null=True, required=False)
+    applicationOutputs = OutputDataObjectTypeSerializer(many=True, allow_null=True, required=False)
+    archiveWorkingDirectory = serializers.BooleanField(default=False)
+    hasOptionalFileInputs = serializers.BooleanField(default=False, read_only=True)
+
     url = FullyEncodedHyperlinkedIdentityField(
         view_name='django_airavata_api:application-interface-detail',
         lookup_field='applicationInterfaceId',
-        lookup_url_kwarg='app_interface_id')
-    applicationInputs = OrderedListField(
-        order_by='inputOrder',
-        child=InputDataObjectTypeSerializer(),
-        allow_null=True)
-    applicationOutputs = OutputDataObjectTypeSerializer(many=True)
+        lookup_url_kwarg='app_interface_id', read_only=True)
     userHasWriteAccess = serializers.SerializerMethodField()
     showQueueSettings = serializers.BooleanField(required=False)
     queueSettingsCalculatorId = serializers.CharField(allow_null=True, required=False)
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        application_module_id = instance.applicationModules[0]
-        application_settings, created = models.ApplicationSettings.objects.get_or_create(
-            application_module_id=application_module_id)
-        representation["showQueueSettings"] = application_settings.show_queue_settings
-        # check that queue_settings_calculator_id exists
-        if queue_settings_calculators.exists(application_settings.queue_settings_calculator_id):
-            representation["queueSettingsCalculatorId"] = application_settings.queue_settings_calculator_id
-        return representation
-
     def create(self, validated_data):
-        showQueueSettings = validated_data.pop("showQueueSettings", True)
-        queueSettingsCalculatorId = validated_data.pop("queueSettingsCalculatorId", None)
-        application_interface = super().create(validated_data)
-        application_module_id = application_interface.applicationModules[0]
-        models.ApplicationSettings.objects.update_or_create(
-            application_module_id=application_module_id,
-            defaults={"show_queue_settings": showQueueSettings,
-                      "queue_settings_calculator_id": queueSettingsCalculatorId}
-        )
-        return application_interface
+        return ApplicationInterfaceDescription(**validated_data)
 
     def update(self, instance, validated_data):
         defaults = {}
@@ -372,12 +407,24 @@ class ApplicationInterfaceDescriptionSerializer(
             defaults["show_queue_settings"] = validated_data.pop("showQueueSettings")
         if "queueSettingsCalculatorId" in validated_data:
             defaults["queue_settings_calculator_id"] = validated_data.pop("queueSettingsCalculatorId")
-        application_interface = super().update(instance, validated_data)
-        application_module_id = application_interface.applicationModules[0]
-        models.ApplicationSettings.objects.update_or_create(
-            application_module_id=application_module_id, defaults=defaults
-        )
-        return application_interface
+        application_module_id = instance.applicationModules[0]
+        if defaults:
+            models.ApplicationSettings.objects.update_or_create(
+                application_module_id=application_module_id, defaults=defaults
+            )
+
+        inputs_data = validated_data.pop('applicationInputs', None)
+        outputs_data = validated_data.pop('applicationOutputs', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if inputs_data is not None:
+            instance.applicationInputs = [InputDataObjectType(**inp) for inp in inputs_data]
+        if outputs_data is not None:
+            instance.applicationOutputs = [OutputDataObjectType(**out) for out in outputs_data]
+
+        return instance
 
     def get_userHasWriteAccess(self, appDeployment):
         request = self.context['request']
@@ -673,7 +720,16 @@ class ComputeResourceReservationSerializer(
 
 class GroupComputeResourcePreferenceSerializer(
         thrift_utils.create_serializer_class(GroupComputeResourcePreference)):
-    reservations = ComputeResourceReservationSerializer(many=True)
+    reservations = serializers.SerializerMethodField()
+
+    # Check if the object (e.g. SLURM type) has the 'reservations' attribute
+    def get_reservations(self, obj):
+        if hasattr(obj, 'reservations'):
+            reservations_data = getattr(obj, 'reservations')
+            if reservations_data is not None:
+                return ComputeResourceReservationSerializer(reservations_data, many=True, context=self.context).data
+
+        return []
 
 
 class GroupResourceProfileSerializer(

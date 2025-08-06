@@ -1,10 +1,11 @@
-import { SessionType } from "@/interfaces/SessionType";
-import { SessionCard } from "./SessionCard";
+import {SessionType} from "@/interfaces/SessionType";
+import {SessionCard} from "./SessionCard";
 import api from "@/lib/api";
-import { useEffect, useState } from "react";
-import { CONTROLLER } from "@/lib/controller";
-import { Button, HStack, SimpleGrid, Text } from "@chakra-ui/react";
-import { SessionStatusEnum } from "@/interfaces/SessionStatusEnum";
+import {useEffect, useState} from "react";
+import {CONTROLLER} from "@/lib/controller";
+import {Button, HStack, SimpleGrid, Text} from "@chakra-ui/react";
+import {SessionStatusEnum} from "@/interfaces/SessionStatusEnum";
+import {DeleteAllSessions} from "@/components/home/DeleteAllSessions.tsx";
 
 async function getSessions(status: SessionStatusEnum | null = null) {
   try {
@@ -26,7 +27,7 @@ async function getSessions(status: SessionStatusEnum | null = null) {
 
 export const SessionsSection = () => {
   const [sessionStatusFilter, setSessionStatusFilter] =
-    useState<SessionStatusEnum | null>(null);
+      useState<SessionStatusEnum | null>(null);
   const [sessions, setSessions] = useState<SessionType[]>([]);
 
   useEffect(() => {
@@ -54,42 +55,49 @@ export const SessionsSection = () => {
   ];
 
   return (
-    <>
-      <HStack flexWrap={"wrap"} gap={2} mt={4}>
-        <Button
-          variant={sessionStatusFilter === null ? "solid" : "outline"}
-          size="sm"
-          onClick={() => {
-            setSessionStatusFilter(null);
-          }}
-        >
-          All
-        </Button>
-        {/* {Object.values(SessionStatusEnum).map((status) => ( */}
-        {sessionStatusFilterOptions.map((status) => (
-          <Button
-            key={status}
-            variant={sessionStatusFilter === status ? "solid" : "outline"}
-            size="sm"
-            onClick={() => {
-              setSessionStatusFilter(status);
-            }}
-          >
-            {status}
-          </Button>
-        ))}
-      </HStack>
-      <SimpleGrid mt={4} columns={{ base: 1, md: 2, lg: 3 }} gap={4}>
-        {sessions.map((session: SessionType) => {
-          return <SessionCard key={session.id} session={session} />;
-        })}
-      </SimpleGrid>
+      <>
+        <HStack flexWrap={"wrap"} mt={4} justifyContent={'space-between'}>
+          <HStack flexWrap={"wrap"} gap={2}>
+            <Button
+                variant={sessionStatusFilter === null ? "solid" : "outline"}
+                size="sm"
+                onClick={() => {
+                  setSessionStatusFilter(null);
+                }}
+            >
+              All
+            </Button>
+            {/* {Object.values(SessionStatusEnum).map((status) => ( */}
+            {sessionStatusFilterOptions.map((status) => (
+                <Button
+                    key={status}
+                    variant={sessionStatusFilter === status ? "solid" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setSessionStatusFilter(status);
+                    }}
+                >
+                  {status}
+                </Button>
+            ))}
+          </HStack>
+          {
+              sessions.length > 0 && (
+                  <DeleteAllSessions sessions={sessions} setSessions={setSessions}/>
+              )
+          }
+        </HStack>
+        <SimpleGrid mt={4} columns={{base: 1, md: 2, lg: 3}} gap={4}>
+          {sessions.map((session: SessionType) => {
+            return <SessionCard key={session.id} session={session}/>;
+          })}
+        </SimpleGrid>
 
-      {sessions.length === 0 && (
-        <Text mt={4} color="gray.500">
-          No sessions found.
-        </Text>
-      )}
-    </>
+        {sessions.length === 0 && (
+            <Text mt={4} color="gray.500">
+              No sessions found.
+            </Text>
+        )}
+      </>
   );
 };

@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import "./Results2.css";
 import Chatbox from "./Chatbox";
 import ReactMarkdown from "react-markdown";
+import FormattedMessage from "./FormattedMessage";
+
 
 export interface Message {
   id: string;
@@ -34,10 +36,7 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
         text: state.question,
         timestamp: new Date(),
       };
-      // setMessages([
-      //   { from: "user", text: state.question },
-      //   { from: "bot", text: "Hi {username} :)" },
-      // ]);
+
       setDisplayedMessages([initialMessage]);
 
       // add bot response after delay
@@ -74,11 +73,12 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
           <div
             key={msg.id}
             className={`messageRow ${msg.from}`}
-            // adding an animation to make it smoother
+
             style={{
               animation: `slideIn 0.3s ease-out ${idx * 0.1}s both`,
             }}
           >
+
             <div className={`messageRow ${msg.from}`}>
               <div className="messageGroup">
                 <div className={`messageBubble ${msg.from}`}>
@@ -94,6 +94,7 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
                 <div className={`messageTimestamp ${msg.from}`}>
                   {formatTime(msg.timestamp)}
                 </div>
+
               </div>
             </div>
           </div>
@@ -103,11 +104,15 @@ const Results: React.FC<ResultsProps> = ({ messages = [], onSendMessage }) => {
 
       <Chatbox
         fixedBottom
+
         onSend={onSendMessage} // src code in Chatbox.tsx
+
         messages={displayedMessages}
       />
     </div>
   );
 };
 
+
 export default Results;
+
